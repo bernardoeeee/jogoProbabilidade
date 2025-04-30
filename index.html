@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BacBo Aposta</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #1e1e2f, #2a2a3b);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 20px;
+    }
+    .saldo {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+    .dados {
+      display: flex;
+      justify-content: center;
+      gap: 100px;
+      margin-bottom: 20px;
+    }
+    .dados div {
+      text-align: center;
+    }
+    .dado {
+      width: 60px;
+      height: 60px;
+      background: white;
+      color: black;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      margin: 10px auto;
+      font-size: 24px;
+      font-weight: bold;
+      animation: roll 0.5s ease;
+    }
+    @keyframes roll {
+      0% { transform: rotate(0deg); }
+      50% { transform: rotate(180deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .escolha {
+      margin-bottom: 10px;
+    }
+    .escolha button {
+      background: #37474f;
+      color: white;
+      padding: 12px 20px;
+      margin: 0 5px;
+      border-radius: 20px;
+      font-size: 16px;
+      border: none;
+    }
+    .escolha button:hover {
+      background: #546e7a;
+    }
+    .fichas {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .fichas button {
+      border-radius: 50%;
+      width: 80px;
+      height: 80px;
+      font-weight: bold;
+      font-size: 16px;
+      color: black;
+      border: none;
+    }
+    .fichas button:nth-child(2) { background-color: #b71c1c; color: black;}
+    .fichas button:nth-child(3) { background-color: #e65100; color: black;}
+    .fichas button:nth-child(4) { background-color: #fbc02d; color: black;}
+    .fichas button:nth-child(5) { background-color: #43a047; color: black;}
+    .fichas button:nth-child(6) { background-color: #1e88e5; color: black;}
+    .fichas button:nth-child(7) { background-color: #6a1b9a; color: black;}
+    .fichas button:nth-child(8) { background-color: #d81b60; color: black;}
+    .fichas button:nth-child(9) { background-color: #212121; color: black;}
+    .resultado-final {
+      margin-top: 20px;
+      font-weight: bold;
+      font-size: 22px;
+    }
+    .resultado-final.ganhou { color: #4caf50; }
+    .resultado-final.perdeu { color: #f44336; }
+  </style>
+</head>
+<body>
+  <h1>Jogo de Aposta</h1>
+  <div class="saldo">Saldo: <span id="saldo">100</span> Reais</div>
+
+  <div class="dados">
+    <div>
+      <h3 style="color: #2196f3">Azul</h3>
+      <div id="azul-dado1" class="dado">🎲</div>
+      <div id="azul-dado2" class="dado">🎲</div>
+    </div>
+    <div>
+      <h3 style="color: #f44336">Vermelho</h3>
+      <div id="vermelho-dado1" class="dado">🎲</div>
+      <div id="vermelho-dado2" class="dado">🎲</div>
+    </div>
+  </div>
+
+  <div class="escolha">
+    <strong>Aposte em:</strong>
+    <button onclick="apostar('azul')">Azul</button>
+    <button onclick="apostar('vermelho')">Vermelho</button>
+    <button onclick="apostar('empate')">Empate</button>
+  </div>
+
+  <div class="fichas">
+    <button onclick="selecionarFicha(5)">5</button>
+    <button onclick="selecionarFicha(10)">10</button>
+    <button onclick="selecionarFicha(25)">25</button>
+    <button onclick="selecionarFicha(125)">125</button>
+    <button onclick="selecionarFicha(500)">500</button>
+    <button onclick="selecionarFicha(2500)">2500</button>
+    <button onclick="selecionarFicha(5000)">5000</button>
+    <button onclick="selecionarFicha(10000)">10000</button>
+  </div>
+
+  <div class="resultado-final" id="resultado-final"></div>
+
+  <script>
+    let saldo = 100;
+    let fichaSelecionada = 5;
+    let apostaUsuario = null;
+
+    function atualizarSaldo() {
+      if (saldo < 5) {
+        saldo += 20;
+        alert("Seu saldo era muito baixo. 20 reais foram adicionados à sua conta.");
+      }
+      document.getElementById("saldo").innerText = saldo;
+    }
+
+    function selecionarFicha(valor) {
+      fichaSelecionada = valor;
+    }
+
+    function jogarDado() {
+      return Math.floor(Math.random() * 6) + 1;
+    }
+
+    function animarDado(id, valor) {
+      const dado = document.getElementById(id);
+      dado.classList.remove('dado');
+      void dado.offsetWidth;
+      dado.classList.add('dado');
+      dado.innerText = valor;
+    }
+
+    function apostar(escolha) {
+      if (saldo < fichaSelecionada) {
+        alert("Saldo insuficiente!");
+        return;
+      }
+      apostaUsuario = escolha;
+      saldo -= fichaSelecionada;
+
+      let azul1 = jogarDado();
+      let vermelho1 = jogarDado();
+      animarDado("azul-dado1", azul1);
+      animarDado("vermelho-dado1", vermelho1);
+
+      let primeiro = 'azul';
+      if (vermelho1 > azul1) primeiro = 'vermelho';
+
+      let azul2 = jogarDado();
+      let vermelho2 = jogarDado();
+      animarDado("azul-dado2", azul2);
+      animarDado("vermelho-dado2", vermelho2);
+
+      let somaAzul = azul1 + azul2;
+      let somaVermelho = vermelho1 + vermelho2;
+
+      let resultado = "";
+      let resultadoEl = document.getElementById("resultado-final");
+
+      const azulPar = azul1 === azul2;
+      const vermelhoPar = vermelho1 === vermelho2;
+
+      if ((apostaUsuario === "azul" && azulPar) || (apostaUsuario === "vermelho" && vermelhoPar)) {
+        let ganho = fichaSelecionada * 50;
+        saldo += ganho;
+        resultado = `Você acertou um par em ${apostaUsuario}! Ganhou ${ganho} fichas (x50)`;
+        resultadoEl.className = "resultado-final ganhou";
+      } else if (somaAzul === somaVermelho) {
+        if (apostaUsuario === "empate") {
+          let multiplicador = calcularMultiplicador(somaAzul);
+          let ganho = fichaSelecionada * multiplicador;
+          saldo += ganho;
+          resultado = `Empate! Você ganhou ${ganho} fichas (x${multiplicador})`;
+          resultadoEl.className = "resultado-final ganhou";
+        } else {
+          resultado = "Empate! Mas você não apostou nisso.";
+          resultadoEl.className = "resultado-final perdeu";
+        }
+      } else if ((somaAzul > somaVermelho && apostaUsuario === "azul") ||
+                 (somaVermelho > somaAzul && apostaUsuario === "vermelho")) {
+        saldo += fichaSelecionada * 2;
+        resultado = `Você ganhou! (${apostaUsuario})`;
+        resultadoEl.className = "resultado-final ganhou";
+      } else {
+        resultado = "Você perdeu!";
+        resultadoEl.className = "resultado-final perdeu";
+      }
+
+      resultadoEl.innerText = resultado;
+      atualizarSaldo();
+    }
+
+    function calcularMultiplicador(soma) {
+      if (soma === 2 || soma === 12) return 88;
+      if (soma === 3 || soma === 11) return 25;
+      if (soma === 4 || soma === 10) return 10;
+      if (soma === 5 || soma === 9) return 8;
+      return 4;
+    }
+
+    atualizarSaldo();
+  </script>
+</body>
+</html>
