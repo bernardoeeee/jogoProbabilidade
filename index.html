@@ -120,6 +120,12 @@
       .resultado-final.perdeu {
         color: #f44336;
       }
+
+      .fichas button.selecionado {
+        box-shadow: 0 0 10px 3px #ffc107;
+        background: #ffe082;
+      }
+
     </style>
   </head>
   <body>
@@ -222,6 +228,18 @@
         }
         document.getElementById('saldo').innerText = saldo;
       }
+      function selecionarFicha(valor) {
+        fichaSelecionada = valor;
+
+        const botoes = document.querySelectorAll(".fichas button");
+        botoes.forEach(btn => btn.classList.remove("selecionado"));
+      
+        const btnSelecionado = Array.from(botoes).find(btn => btn.innerText == valor);
+        if (btnSelecionado) {
+           btnSelecionado.classList.add("selecionado");
+          }
+      }
+
 
       async function apostar(escolha) {
         if (saldo < fichaSelecionada) {
