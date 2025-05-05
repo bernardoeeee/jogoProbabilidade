@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BacBo Aposta</title>
+  <title>Jogo de Cartas</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -12,7 +12,6 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: flex-start;
       padding: 20px;
     }
     .saldo {
@@ -20,36 +19,27 @@
       font-weight: bold;
       margin-bottom: 20px;
     }
-    .dados {
+    .cartas {
       display: flex;
       justify-content: center;
       gap: 100px;
       margin-bottom: 20px;
     }
-    .dados div {
+    .cartas div {
       text-align: center;
     }
-    .dado {
+    .carta {
       width: 60px;
-      height: 60px;
+      height: 90px;
       background: white;
       color: black;
       display: flex;
       align-items: center;
       justify-content: center;
-      border-radius: 12px;
+      border-radius: 8px;
       margin: 10px auto;
-      font-size: 24px;
+      font-size: 20px;
       font-weight: bold;
-      animation: roll 0.5s ease;
-    }
-    @keyframes roll {
-      0% { transform: rotate(0deg); }
-      50% { transform: rotate(180deg); }
-      100% { transform: rotate(360deg); }
-    }
-    .escolha {
-      margin-bottom: 10px;
     }
     .escolha button {
       background: #37474f;
@@ -79,14 +69,6 @@
       color: black;
       border: none;
     }
-    .fichas button:nth-child(2) { background-color: #b71c1c; color: black;}
-    .fichas button:nth-child(3) { background-color: #e65100; color: black;}
-    .fichas button:nth-child(4) { background-color: #fbc02d; color: black;}
-    .fichas button:nth-child(5) { background-color: #43a047; color: black;}
-    .fichas button:nth-child(6) { background-color: #1e88e5; color: black;}
-    .fichas button:nth-child(7) { background-color: #6a1b9a; color: black;}
-    .fichas button:nth-child(8) { background-color: #d81b60; color: black;}
-    .fichas button:nth-child(9) { background-color: #212121; color: black;}
     .resultado-final {
       margin-top: 20px;
       font-weight: bold;
@@ -94,22 +76,54 @@
     }
     .resultado-final.ganhou { color: #4caf50; }
     .resultado-final.perdeu { color: #f44336; }
+    
+    .carta {
+    width: 60px;
+    height: 90px;
+    background: white;
+    color: black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    margin: 10px auto;
+    font-size: 20px;
+    font-weight: bold;
+    transition: transform 0.5s, opacity 0.3s;
+    transform: rotateY(0deg);
+    backface-visibility: hidden;
+  }
+  .carta.revelar {
+    transform: rotateY(360deg);
+  }
+
+  .embaralhar {
+    animation: shake 0.8s;
+  }
+
+  @keyframes shake {
+    0% { transform: rotate(0); }
+    25% { transform: rotate(3deg); }
+    50% { transform: rotate(-3deg); }
+    75% { transform: rotate(3deg); }
+    100% { transform: rotate(0); }
+  }
   </style>
 </head>
 <body>
-  <h1>Jogo de Aposta</h1>
+  <h1>Jogo de Cartas</h1>
   <div class="saldo">Saldo: <span id="saldo">100</span> Reais</div>
 
-  <div class="dados">
+  <div class="cartas">
     <div>
       <h3 style="color: #2196f3">Azul</h3>
-      <div id="azul-dado1" class="dado">🎲</div>
-      <div id="azul-dado2" class="dado">🎲</div>
+      <div id="azul-carta1" class="carta">🂠</div>
+      <div id="azul-carta2" class="carta">🂠</div>
     </div>
     <div>
       <h3 style="color: #f44336">Vermelho</h3>
-      <div id="vermelho-dado1" class="dado">🎲</div>
-      <div id="vermelho-dado2" class="dado">🎲</div>
+      <div id="vermelho-carta1" class="carta">🂠</div>
+      <div id="vermelho-carta2" class="carta">🂠</div>
     </div>
   </div>
 
@@ -132,11 +146,47 @@
   </div>
 
   <div class="resultado-final" id="resultado-final"></div>
+  <div style="margin-top: 20px;">
+    <button onclick="reiniciarJogo()" style="padding: 10px 20px; border-radius: 10px; background: #9c27b0; color: white; font-weight: bold; border: none;">
+      Reiniciar Jogo
+    </button>
+  </div>
 
   <script>
     let saldo = 100;
     let fichaSelecionada = 5;
     let apostaUsuario = null;
+
+    const baralho = [];
+    const valores = {
+      "A": 1, "2": 2, "3": 3, "4": 4, "5": 5,
+      "6": 6, "7": 7, "8": 8, "9": 9, "10": 10,
+      "J": 11, "Q": 12, "K": 13
+    };
+
+    function criarBaralho() {
+      const naipes = ["♠", "♥", "♦", "♣"];
+      const cartas = Object.keys(valores);
+      let baralhoNovo = [];
+      for (let naipe of naipes) {
+        for (let carta of cartas) {
+          baralhoNovo.push({ texto: carta + naipe, valor: valores[carta] });
+        }
+      }
+      return baralhoNovo;
+    }
+
+    function embaralhar(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    function selecionarFicha(valor) {
+      fichaSelecionada = valor;
+    }
 
     function atualizarSaldo() {
       if (saldo < 5) {
@@ -146,91 +196,99 @@
       document.getElementById("saldo").innerText = saldo;
     }
 
-    function selecionarFicha(valor) {
-      fichaSelecionada = valor;
+  async function apostar(escolha) {
+    if (saldo < fichaSelecionada) {
+      alert("Saldo insuficiente!");
+      return;
     }
 
-    function jogarDado() {
-      return Math.floor(Math.random() * 6) + 1;
-    }
+    apostaUsuario = escolha;
+    saldo -= fichaSelecionada;
+    atualizarSaldo();
 
-    function animarDado(id, valor) {
-      const dado = document.getElementById(id);
-      dado.classList.remove('dado');
-      void dado.offsetWidth;
-      dado.classList.add('dado');
-      dado.innerText = valor;
-    }
+    let baralhoAtual = embaralhar(criarBaralho());
 
-    function apostar(escolha) {
-      if (saldo < fichaSelecionada) {
-        alert("Saldo insuficiente!");
-        return;
-      }
-      apostaUsuario = escolha;
-      saldo -= fichaSelecionada;
+    // Adiciona animação de embaralhamento
+    document.body.classList.add("embaralhar");
+    await new Promise(resolve => setTimeout(resolve, 800));
+    document.body.classList.remove("embaralhar");
 
-      let azul1 = jogarDado();
-      let vermelho1 = jogarDado();
-      animarDado("azul-dado1", azul1);
-      animarDado("vermelho-dado1", vermelho1);
+    // Distribuir cartas com delay e animação
+    let azul1 = baralhoAtual.pop();
+    await mostrarCarta("azul-carta1", azul1.texto);
 
-      let primeiro = 'azul';
-      if (vermelho1 > azul1) primeiro = 'vermelho';
+    let azul2 = baralhoAtual.pop();
+    await mostrarCarta("azul-carta2", azul2.texto);
 
-      let azul2 = jogarDado();
-      let vermelho2 = jogarDado();
-      animarDado("azul-dado2", azul2);
-      animarDado("vermelho-dado2", vermelho2);
+    let vermelho1 = baralhoAtual.pop();
+    await mostrarCarta("vermelho-carta1", vermelho1.texto);
 
-      let somaAzul = azul1 + azul2;
-      let somaVermelho = vermelho1 + vermelho2;
+    let vermelho2 = baralhoAtual.pop();
+    await mostrarCarta("vermelho-carta2", vermelho2.texto);
 
-      let resultado = "";
-      let resultadoEl = document.getElementById("resultado-final");
+    let somaAzul = azul1.valor + azul2.valor;
+    let somaVermelho = vermelho1.valor + vermelho2.valor;
 
-      const azulPar = azul1 === azul2;
-      const vermelhoPar = vermelho1 === vermelho2;
+    let resultadoEl = document.getElementById("resultado-final");
+    let resultado = "";
 
-      if ((apostaUsuario === "azul" && azulPar) || (apostaUsuario === "vermelho" && vermelhoPar)) {
+    if (somaAzul === somaVermelho) {
+      if (apostaUsuario === "empate") {
         let ganho = fichaSelecionada * 50;
         saldo += ganho;
-        resultado = `Você acertou um par em ${apostaUsuario}! Ganhou ${ganho} fichas (x50)`;
-        resultadoEl.className = "resultado-final ganhou";
-      } else if (somaAzul === somaVermelho) {
-        if (apostaUsuario === "empate") {
-          let multiplicador = calcularMultiplicador(somaAzul);
-          let ganho = fichaSelecionada * multiplicador;
-          saldo += ganho;
-          resultado = `Empate! Você ganhou ${ganho} fichas (x${multiplicador})`;
-          resultadoEl.className = "resultado-final ganhou";
-        } else {
-          resultado = "Empate! Mas você não apostou nisso.";
-          resultadoEl.className = "resultado-final perdeu";
-        }
-      } else if ((somaAzul > somaVermelho && apostaUsuario === "azul") ||
-                 (somaVermelho > somaAzul && apostaUsuario === "vermelho")) {
-        saldo += fichaSelecionada * 2;
-        resultado = `Você ganhou! (${apostaUsuario})`;
+        resultado = `Empate! Você ganhou ${ganho} fichas (x50)`;
         resultadoEl.className = "resultado-final ganhou";
       } else {
-        resultado = "Você perdeu!";
+        resultado = "Empate! Mas você não apostou nisso.";
         resultadoEl.className = "resultado-final perdeu";
       }
-
-      resultadoEl.innerText = resultado;
-      atualizarSaldo();
+    } else if (
+      (somaAzul > somaVermelho && apostaUsuario === "azul") ||
+      (somaVermelho > somaAzul && apostaUsuario === "vermelho")
+    ) {
+      saldo += fichaSelecionada * 2;
+      resultado = `Você ganhou! (${apostaUsuario})`;
+      resultadoEl.className = "resultado-final ganhou";
+    } else {
+      resultado = "Você perdeu!";
+      resultadoEl.className = "resultado-final perdeu";
     }
 
-    function calcularMultiplicador(soma) {
-      if (soma === 2 || soma === 12) return 88;
-      if (soma === 3 || soma === 11) return 25;
-      if (soma === 4 || soma === 10) return 10;
-      if (soma === 5 || soma === 9) return 8;
-      return 4;
-    }
-
+    resultadoEl.innerText = resultado;
     atualizarSaldo();
+  }
+
+  async function mostrarCarta(id, texto) {
+    const el = document.getElementById(id);
+    el.classList.remove("revelar");
+    el.innerText = "🂠";
+    await new Promise(resolve => setTimeout(resolve, 300));
+    el.classList.add("revelar");
+    await new Promise(resolve => setTimeout(resolve, 200));
+    el.innerText = texto;
+  }
+
+  atualizarSaldo();
+
+function reiniciarJogo() {
+  saldo = 100;
+  atualizarSaldo();
+
+  const idsCartas = [
+    "azul-carta1", "azul-carta2",
+    "vermelho-carta1", "vermelho-carta2"
+  ];
+
+  idsCartas.forEach(id => {
+    const el = document.getElementById(id);
+    el.innerText = "🂠";
+    el.classList.remove("revelar");
+  });
+
+  const resultadoEl = document.getElementById("resultado-final");
+  resultadoEl.innerText = "";
+  resultadoEl.className = "resultado-final";
+}
   </script>
 </body>
 </html>
