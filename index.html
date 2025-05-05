@@ -1,339 +1,311 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Jogo de Cartas</title>
-    <style>
-      body {
-        font-family: 'Segoe UI', sans-serif;
-        background: linear-gradient(to right, #1e1e2f, #2a2a3b);
-        color: white;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 20px;
-      }
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jogo de Cartas</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #1e1e2f, #2a2a3b);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
 
-      .saldo {
-        font-size: 20px;
-        font-weight: bold;
-        margin-bottom: 20px;
-      }
+    .saldo {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
 
-      .cartas {
-        display: flex;
-        justify-content: center;
-        gap: 100px;
-        margin-bottom: 20px;
-      }
+    .cartas {
+      display: flex;
+      justify-content: center;
+      gap: 100px;
+      margin-bottom: 20px;
+    }
 
-      .cartas div {
-        text-align: center;
-      }
+    .cartas div {
+      text-align: center;
+    }
 
-      .carta {
-        width: 60px;
-        height: 90px;
-        background: white;
-        color: black;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 8px;
-        margin: 10px auto;
-        font-size: 20px;
-        font-weight: bold;
-        transition: transform 0.5s, opacity 0.3s;
-        transform: rotateY(0deg);
-        backface-visibility: hidden;
-      }
+    .carta {
+      width: 60px;
+      height: 90px;
+      background: white;
+      color: black;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      margin: 10px auto;
+      font-size: 20px;
+      font-weight: bold;
+      transition: transform 0.5s, opacity 0.3s;
+      transform: rotateY(0deg);
+      backface-visibility: hidden;
+    }
 
-      .carta.revelar {
-        transform: rotateY(360deg);
-      }
+    .carta.revelar {
+      transform: rotateY(360deg);
+    }
 
-      .embaralhar {
-        animation: shake 0.8s;
-      }
+    .embaralhar {
+      animation: shake 0.8s;
+    }
 
-      @keyframes shake {
-        0% {
-          transform: rotate(0);
-        }
-        25% {
-          transform: rotate(3deg);
-        }
-        50% {
-          transform: rotate(-3deg);
-        }
-        75% {
-          transform: rotate(3deg);
-        }
-        100% {
-          transform: rotate(0);
-        }
-      }
+    @keyframes shake {
+      0% { transform: rotate(0); }
+      25% { transform: rotate(3deg); }
+      50% { transform: rotate(-3deg); }
+      75% { transform: rotate(3deg); }
+      100% { transform: rotate(0); }
+    }
 
-      .escolha button {
-        background: #37474f;
-        color: white;
-        padding: 12px 20px;
-        margin: 0 5px;
-        border-radius: 20px;
-        font-size: 16px;
-        border: none;
-      }
+    .escolha button {
+      background: #37474f;
+      color: white;
+      padding: 12px 20px;
+      margin: 0 5px;
+      border-radius: 20px;
+      font-size: 16px;
+      border: none;
+    }
 
-      .escolha button:hover {
-        background: #546e7a;
-      }
+    .escolha button:hover {
+      background: #546e7a;
+    }
 
-      .fichas {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 10px;
-        margin-top: 10px;
-      }
+    .fichas {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
 
-      .fichas button {
-        border-radius: 50%;
-        width: 80px;
-        height: 80px;
-        font-weight: bold;
-        font-size: 16px;
-        color: black;
-        border: none;
-      }
+    .fichas button {
+      border-radius: 50%;
+      width: 80px;
+      height: 80px;
+      font-weight: bold;
+      font-size: 16px;
+      color: black;
+      border: none;
+      background: #fff59d;
+    }
 
-      .resultado-final {
-        margin-top: 20px;
-        font-weight: bold;
-        font-size: 22px;
-      }
+    .fichas button.selecionado {
+      box-shadow: 0 0 10px 3px #ffc107;
+      background: #ffe082;
+    }
 
-      .resultado-final.ganhou {
-        color: #4caf50;
-      }
+    .resultado-final {
+      margin-top: 20px;
+      font-weight: bold;
+      font-size: 22px;
+    }
 
-      .resultado-final.perdeu {
-        color: #f44336;
-      }
+    .resultado-final.ganhou {
+      color: #4caf50;
+    }
 
-      .fichas button.selecionado {
-        box-shadow: 0 0 10px 3px #ffc107;
-        background: #ffe082;
-      }
+    .resultado-final.perdeu {
+      color: #f44336;
+    }
+  </style>
+</head>
+<body>
+  <h1>Jogo de Cartas</h1>
 
-    </style>
-  </head>
-  <body>
-    <h1>Jogo de Cartas</h1>
-    <div class="saldo">Saldo: <span id="saldo">100</span> Reais</div>
+  <div class="saldo">Saldo: <span id="saldo">100</span> Reais</div>
 
-    <div class="cartas">
-      <div>
-        <h3 style="color: #2196f3">Azul</h3>
-        <div id="azul-carta1" class="carta">🂠</div>
-        <div id="azul-carta2" class="carta">🂠</div>
-      </div>
-      <div>
-        <h3 style="color: #f44336">Vermelho</h3>
-        <div id="vermelho-carta1" class="carta">🂠</div>
-        <div id="vermelho-carta2" class="carta">🂠</div>
-      </div>
+  <div class="cartas">
+    <div>
+      <h3 style="color: #2196f3">Azul</h3>
+      <div id="azul-carta1" class="carta">🂠</div>
+      <div id="azul-carta2" class="carta">🂠</div>
     </div>
-
-    <div class="escolha">
-      <strong>Aposte em:</strong>
-      <button onclick="apostar('azul')">Azul</button>
-      <button onclick="apostar('vermelho')">Vermelho</button>
-      <button onclick="apostar('empate')">Empate</button>
+    <div>
+      <h3 style="color: #f44336">Vermelho</h3>
+      <div id="vermelho-carta1" class="carta">🂠</div>
+      <div id="vermelho-carta2" class="carta">🂠</div>
     </div>
+  </div>
 
-    <div class="fichas">
-      <button onclick="selecionarFicha(5)">5</button>
-      <button onclick="selecionarFicha(10)">10</button>
-      <button onclick="selecionarFicha(25)">25</button>
-      <button onclick="selecionarFicha(125)">125</button>
-      <button onclick="selecionarFicha(500)">500</button>
-      <button onclick="selecionarFicha(2500)">2500</button>
-      <button onclick="selecionarFicha(5000)">5000</button>
-      <button onclick="selecionarFicha(10000)">10000</button>
-    </div>
+  <div class="escolha">
+    <strong>Aposte em:</strong>
+    <button onclick="apostar('azul')">Azul</button>
+    <button onclick="apostar('vermelho')">Vermelho</button>
+    <button onclick="apostar('empate')">Empate</button>
+  </div>
 
-    <div class="resultado-final" id="resultado-final"></div>
+  <div class="fichas">
+    <button onclick="selecionarFicha(5)">5</button>
+    <button onclick="selecionarFicha(10)">10</button>
+    <button onclick="selecionarFicha(25)">25</button>
+    <button onclick="selecionarFicha(125)">125</button>
+    <button onclick="selecionarFicha(500)">500</button>
+    <button onclick="selecionarFicha(2500)">2500</button>
+    <button onclick="selecionarFicha(5000)">5000</button>
+    <button onclick="selecionarFicha(10000)">10000</button>
+  </div>
 
-    <div style="margin-top: 20px;">
-      <button
-        onclick="reiniciarJogo()"
-        style="padding: 10px 20px; border-radius: 10px; background: #9c27b0; color: white; font-weight: bold; border: none;"
-      >
-        Reiniciar Jogo
-      </button>
-    </div>
+  <div class="resultado-final" id="resultado-final"></div>
 
-    <script>
-      let saldo = 100;
-      let fichaSelecionada = 5;
-      let apostaUsuario = null;
+  <div style="margin-top: 20px;">
+    <button onclick="reiniciarJogo()" style="padding: 10px 20px; border-radius: 10px; background: #9c27b0; color: white; font-weight: bold; border: none;">
+      Reiniciar Jogo
+    </button>
+  </div>
 
-      const valores = {
-        A: 1,
-        2: 2,
-        3: 3,
-        4: 4,
-        5: 5,
-        6: 6,
-        7: 7,
-        8: 8,
-        9: 9,
-        10: 10,
-        J: 11,
-        Q: 12,
-        K: 13,
-      };
+  <script>
+    let saldo = 100;
+    let fichaSelecionada = 5;
+    let apostaUsuario = null;
 
-      function criarBaralho() {
-        const naipes = ['♠', '♥', '♦', '♣'];
-        const cartas = Object.keys(valores);
-        let baralhoNovo = [];
+    const valores = {
+      A: 1, 2: 2, 3: 3, 4: 4,
+      5: 5, 6: 6, 7: 7, 8: 8,
+      9: 9, 10: 10, J: 11, Q: 12, K: 13
+    };
 
-        for (let naipe of naipes) {
-          for (let carta of cartas) {
-            baralhoNovo.push({ texto: carta + naipe, valor: valores[carta] });
-          }
+    function criarBaralho() {
+      const naipes = ['♠', '♥', '♦', '♣'];
+      const cartas = Object.keys(valores);
+      let baralhoNovo = [];
+
+      for (let naipe of naipes) {
+        for (let carta of cartas) {
+          baralhoNovo.push({ texto: carta + naipe, valor: valores[carta] });
         }
-
-        return baralhoNovo;
       }
 
-      function embaralhar(array) {
-        for (let i = array.length - 1; i > 0; i--) {
-          let j = Math.floor(Math.random() * (i + 1));
-          [array[i], array[j]] = [array[j], array[i]];
-        }
-        return array;
+      return baralhoNovo;
+    }
+
+    function embaralhar(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    function selecionarFicha(valor) {
+      fichaSelecionada = valor;
+
+      const botoes = document.querySelectorAll(".fichas button");
+      botoes.forEach(btn => btn.classList.remove("selecionado"));
+
+      const btnSelecionado = Array.from(botoes).find(btn => btn.innerText == valor);
+      if (btnSelecionado) {
+        btnSelecionado.classList.add("selecionado");
+      }
+    }
+
+    function atualizarSaldo() {
+      if (saldo < 5) {
+        saldo += 20;
+        alert('Seu saldo era muito baixo. 20 reais foram adicionados à sua conta.');
+      }
+      document.getElementById('saldo').innerText = saldo;
+    }
+
+    async function apostar(escolha) {
+      if (saldo < fichaSelecionada) {
+        alert('Saldo insuficiente!');
+        return;
       }
 
-      function selecionarFicha(valor) {
-        fichaSelecionada = valor;
-      }
+      apostaUsuario = escolha;
+      saldo -= fichaSelecionada;
+      atualizarSaldo();
 
-      function atualizarSaldo() {
-        if (saldo < 5) {
-          saldo += 20;
-          alert('Seu saldo era muito baixo. 20 reais foram adicionados à sua conta.');
-        }
-        document.getElementById('saldo').innerText = saldo;
-      }
-      function selecionarFicha(valor) {
-        fichaSelecionada = valor;
+      let baralhoAtual = embaralhar(criarBaralho());
 
-        const botoes = document.querySelectorAll(".fichas button");
-        botoes.forEach(btn => btn.classList.remove("selecionado"));
-      
-        const btnSelecionado = Array.from(botoes).find(btn => btn.innerText == valor);
-        if (btnSelecionado) {
-           btnSelecionado.classList.add("selecionado");
-          }
-      }
+      document.body.classList.add('embaralhar');
+      await new Promise(resolve => setTimeout(resolve, 800));
+      document.body.classList.remove('embaralhar');
 
+      let azul1 = baralhoAtual.pop();
+      await mostrarCarta('azul-carta1', azul1.texto);
 
-      async function apostar(escolha) {
-        if (saldo < fichaSelecionada) {
-          alert('Saldo insuficiente!');
-          return;
-        }
+      let azul2 = baralhoAtual.pop();
+      await mostrarCarta('azul-carta2', azul2.texto);
 
-        apostaUsuario = escolha;
-        saldo -= fichaSelecionada;
-        atualizarSaldo();
+      let vermelho1 = baralhoAtual.pop();
+      await mostrarCarta('vermelho-carta1', vermelho1.texto);
 
-        let baralhoAtual = embaralhar(criarBaralho());
+      let vermelho2 = baralhoAtual.pop();
+      await mostrarCarta('vermelho-carta2', vermelho2.texto);
 
-        document.body.classList.add('embaralhar');
-        await new Promise((resolve) => setTimeout(resolve, 800));
-        document.body.classList.remove('embaralhar');
+      let somaAzul = azul1.valor + azul2.valor;
+      let somaVermelho = vermelho1.valor + vermelho2.valor;
 
-        let azul1 = baralhoAtual.pop();
-        await mostrarCarta('azul-carta1', azul1.texto);
+      let resultadoEl = document.getElementById('resultado-final');
+      let resultado = '';
 
-        let azul2 = baralhoAtual.pop();
-        await mostrarCarta('azul-carta2', azul2.texto);
-
-        let vermelho1 = baralhoAtual.pop();
-        await mostrarCarta('vermelho-carta1', vermelho1.texto);
-
-        let vermelho2 = baralhoAtual.pop();
-        await mostrarCarta('vermelho-carta2', vermelho2.texto);
-
-        let somaAzul = azul1.valor + azul2.valor;
-        let somaVermelho = vermelho1.valor + vermelho2.valor;
-
-        let resultadoEl = document.getElementById('resultado-final');
-        let resultado = '';
-
-        if (somaAzul === somaVermelho) {
-          if (apostaUsuario === 'empate') {
-            let ganho = fichaSelecionada * 50;
-            saldo += ganho;
-            resultado = `Empate! Você ganhou ${ganho} fichas (x50)`;
-            resultadoEl.className = 'resultado-final ganhou';
-          } else {
-            resultado = 'Empate! Mas você não apostou nisso.';
-            resultadoEl.className = 'resultado-final perdeu';
-          }
-        } else if (
-          (somaAzul > somaVermelho && apostaUsuario === 'azul') ||
-          (somaVermelho > somaAzul && apostaUsuario === 'vermelho')
-        ) {
-          saldo += fichaSelecionada * 2;
-          resultado = `Você ganhou! (${apostaUsuario})`;
+      if (somaAzul === somaVermelho) {
+        if (apostaUsuario === 'empate') {
+          let ganho = fichaSelecionada * 50;
+          saldo += ganho;
+          resultado = `Empate! Você ganhou ${ganho} fichas (x50)`;
           resultadoEl.className = 'resultado-final ganhou';
         } else {
-          resultado = 'Você perdeu!';
+          resultado = 'Empate! Mas você não apostou nisso.';
           resultadoEl.className = 'resultado-final perdeu';
         }
-
-        resultadoEl.innerText = resultado;
-        atualizarSaldo();
+      } else if (
+        (somaAzul > somaVermelho && apostaUsuario === 'azul') ||
+        (somaVermelho > somaAzul && apostaUsuario === 'vermelho')
+      ) {
+        saldo += fichaSelecionada * 2;
+        resultado = `Você ganhou! (${apostaUsuario})`;
+        resultadoEl.className = 'resultado-final ganhou';
+      } else {
+        resultado = 'Você perdeu!';
+        resultadoEl.className = 'resultado-final perdeu';
       }
 
-      async function mostrarCarta(id, texto) {
-        const el = document.getElementById(id);
-        el.classList.remove('revelar');
-        el.innerText = '🂠';
-        await new Promise((resolve) => setTimeout(resolve, 300));
-        el.classList.add('revelar');
-        await new Promise((resolve) => setTimeout(resolve, 200));
-        el.innerText = texto;
-      }
-
-      function reiniciarJogo() {
-        saldo = 100;
-        atualizarSaldo();
-
-        const idsCartas = [
-          'azul-carta1',
-          'azul-carta2',
-          'vermelho-carta1',
-          'vermelho-carta2',
-        ];
-
-        idsCartas.forEach((id) => {
-          const el = document.getElementById(id);
-          el.innerText = '🂠';
-          el.classList.remove('revelar');
-        });
-
-        const resultadoEl = document.getElementById('resultado-final');
-        resultadoEl.innerText = '';
-        resultadoEl.className = 'resultado-final';
-      }
-
+      resultadoEl.innerText = resultado;
       atualizarSaldo();
-    </script>
-  </body>
+    }
+
+    async function mostrarCarta(id, texto) {
+      const el = document.getElementById(id);
+      el.classList.remove('revelar');
+      el.innerText = '🂠';
+      await new Promise(resolve => setTimeout(resolve, 300));
+      el.classList.add('revelar');
+      await new Promise(resolve => setTimeout(resolve, 200));
+      el.innerText = texto;
+    }
+
+    function reiniciarJogo() {
+      saldo = 100;
+      atualizarSaldo();
+
+      const idsCartas = [
+        'azul-carta1', 'azul-carta2',
+        'vermelho-carta1', 'vermelho-carta2'
+      ];
+
+      idsCartas.forEach(id => {
+        const el = document.getElementById(id);
+        el.innerText = '🂠';
+        el.classList.remove('revelar');
+      });
+
+      const resultadoEl = document.getElementById('resultado-final');
+      resultadoEl.innerText = '';
+      resultadoEl.className = 'resultado-final';
+    }
+
+    atualizarSaldo();
+  </script>
+</body>
 </html>
