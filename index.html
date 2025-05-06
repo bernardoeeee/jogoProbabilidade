@@ -127,12 +127,12 @@
     <div>
       <h3 style="color: #2196f3">Azul</h3>
       <div id="azul-carta1" class="carta">♠</div>
-      <div id="azul-carta2" class="carta">♥</div>
+      <div id="azul-carta2" class="carta">♠</div>
     </div>
     <div>
       <h3 style="color: #f44336">Vermelho</h3>
-      <div id="vermelho-carta1" class="carta">♦</div>
-      <div id="vermelho-carta2" class="carta">♣</div>
+      <div id="vermelho-carta1" class="carta">♠</div>
+      <div id="vermelho-carta2" class="carta">♠</div>
     </div>
   </div>
 
@@ -278,7 +278,7 @@
     async function mostrarCarta(id, texto) {
       const el = document.getElementById(id);
       el.classList.remove('revelar');
-      el.innerText = '🂠';
+      el.innerText = '♠';
       await new Promise(resolve => setTimeout(resolve, 300));
       el.classList.add('revelar');
       await new Promise(resolve => setTimeout(resolve, 200));
@@ -296,7 +296,7 @@
 
       idsCartas.forEach(id => {
         const el = document.getElementById(id);
-        el.innerText = '🂠';
+        el.innerText = '♠';
         el.classList.remove('revelar');
       });
 
